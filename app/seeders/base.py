@@ -1,0 +1,1 @@
+from .article_categories.seeder import ArticleCategorySeeder # noqa

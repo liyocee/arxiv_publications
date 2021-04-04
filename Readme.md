@@ -8,6 +8,9 @@ Metadata synchronization is only happens for the articles that fall in the follo
 - Data Science
 - Machine Learning
 
+## Initial Setup
+- Seed the database with initial data: `python manage.py seed`
+
 # Synchronization approahces
 The project employs two sychronization approaches:
  - ## Initial synchronization
