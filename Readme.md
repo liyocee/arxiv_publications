@@ -13,7 +13,8 @@ The project employs two sychronization approaches:
  - ## Initial synchronization
     - This happens when the application is setup for the first time
     - It fetches six months worth of metadata
-    - It can be kick started by running the command: `python manage.py initial_sync`
+    - It can be kick started by running the command: `python manage.py initial_articles_sync months_offset 3` :
+        - If `months_offset` option is not provided to the command, the sync process will default to syncing 6 months worth of data
 
 - ## Incremental synchronization
     - This happnes on daily basis via a background task
