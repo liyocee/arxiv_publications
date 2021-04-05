@@ -36,12 +36,11 @@ class SubCategory(AbstractBaseModel):
     """
     Article sub category
     """
-    category_id = models.ForeignKey(
+    category = models.ForeignKey(
         Category, null=False, blank=False, on_delete=models.CASCADE)
-    name = models.CharField(
-        max_length=255, null=False, blank=False, unique=True)
+    name = models.CharField(max_length=255, null=False, blank=False)
     code = models.CharField(
-        max_length=255, null=False, blank=False, unique=True,
+        max_length=255, null=False, blank=False,
         help_text="A unique code that identifies the sub category"
     )
 
@@ -51,6 +50,7 @@ class SubCategory(AbstractBaseModel):
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('subcategory')
         verbose_name_plural = _('subcategories')
+        unique_together = ('name', 'code')
 
 
 class Article(AbstractBaseModel):
@@ -61,7 +61,7 @@ class Article(AbstractBaseModel):
         max_length=255, null=False, blank=False, unique=True,
         help_text="Article identifier in the external source")
     summary = models.TextField(null=False, blank=False)
-    category_id = models.ForeignKey(
+    category = models.ForeignKey(
         Category, null=False, blank=False, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
@@ -90,33 +90,33 @@ class Author(AbstractBaseModel):
 
 
 class ArticleAuthor(AbstractBaseModel):
-    author_id = models.ForeignKey(
+    author = models.ForeignKey(
         Author, null=False, blank=False, on_delete=models.CASCADE)
-    article_id = models.ForeignKey(
+    article = models.ForeignKey(
         Article, null=False, blank=False, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f'AuthorId: {self.author_id} | ArticleId: {self.article_id}'
+        return f'Author: {self.author.name} | Article: {self.article.title}'
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('article_author')
         verbose_name_plural = _('article_authors')
-        unique_together = ('article_id', 'author_id')
+        unique_together = ('article', 'author')
 
 
 class ArticleSubCategory(AbstractBaseModel):
-    article_id = models.ForeignKey(
+    article = models.ForeignKey(
         Article, null=False, blank=False, on_delete=models.CASCADE)
-    sub_category_id = models.ForeignKey(
+    sub_category = models.ForeignKey(
         SubCategory, null=False, blank=False, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return (
-            f'SubCategoryId: {self.sub_category_id} | '
-            f'ArticleId: {self.article_id}'
+            f'SubCategory: {self.sub_category.id} | '
+            f'Article: {self.article.id}'
         )
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('article_subcategory')
         verbose_name_plural = _('article_subcategories')
-        unique_together = ('article_id', 'sub_category_id')
+        unique_together = ('article', 'sub_category')
