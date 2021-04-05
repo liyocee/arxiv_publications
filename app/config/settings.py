@@ -153,3 +153,4 @@ ARXIV_BASE_URL = 'http://export.arxiv.org/oai2'
 
 # Auth
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
