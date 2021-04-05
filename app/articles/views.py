@@ -1,7 +1,10 @@
 
 from typing import Any, Dict
+from users.models import UserFavourite
+
 from django.db.models import QuerySet
-from django.views.generic import ListView, DetailView
+from django.http import HttpRequest, HttpResponse
+from django.views.generic import DetailView, ListView
 
 from articles.models import Article, ArticleAuthor, Author
 
@@ -18,6 +21,12 @@ class ArticlesView(ListView):
 class ArticlesDetailView(DetailView):
     model = Article
     template_name = 'articles/detail.html'
+    has_favourite = False
+
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.has_favourite = UserFavourite.has_favourite(
+            self.request.user, self.get_object())
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AuthorArticlesView(ListView):
@@ -25,6 +34,13 @@ class AuthorArticlesView(ListView):
     context_object_name = 'author_articles'
     author = None
     paginate_by = 25
+
+    has_favourite = False
+
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.has_favourite = UserFavourite.has_favourite(
+            self.request.user, self.get_author())
+        return super().dispatch(request, *args, **kwargs)
 
     def get_author(self):
         if self.author:

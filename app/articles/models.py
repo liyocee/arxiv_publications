@@ -1,12 +1,12 @@
 import logging
-from typing import List, Any
+from typing import Any, List
 
 from bs4 import BeautifulSoup
+from dateutil import parser
 from django.db import models
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from dateutil import parser
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ class Author(AbstractBaseModel):
 
     def __str__(self) -> str:
         return f'{self.last_name} {self.first_name}'
-    
+
     @property
     def name(self) -> str:
         return f'{self.last_name} {self.first_name}'
