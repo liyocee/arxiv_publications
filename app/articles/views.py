@@ -9,9 +9,10 @@ from articles.models import Article, ArticleAuthor, Author
 class ArticlesView(ListView):
     template_name = 'articles/list.html'
     context_object_name = 'articles'
+    paginate_by = 25
 
     def get_queryset(self) -> QuerySet:
-        return Article.objects.all().order_by('-created_on')[: 20]
+        return Article.objects.all().order_by('-created_on')
 
 
 class ArticlesDetailView(DetailView):
@@ -23,6 +24,7 @@ class AuthorArticlesView(ListView):
     template_name = 'author/list.html'
     context_object_name = 'author_articles'
     author = None
+    paginate_by = 25
 
     def get_author(self):
         if self.author:
