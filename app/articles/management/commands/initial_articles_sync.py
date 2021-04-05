@@ -1,9 +1,13 @@
-from io import StringIO
-from typing import List, Optional, Dict
+import logging
+from typing import List
 
 from articles.models import Category
+from articles.services.arxiv_articles_data_source_service import \
+    ArxivArticlesDataSourceService
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -51,7 +55,7 @@ class Command(BaseCommand):
             months_offset = settings.INITIAL_SYNC_OFFSET_MONTHS
 
         topics = options.get('topics', '').split(',')
-        selected_categories = self.categories.filter(id__in=topics)
+        selected_categories: List[Category] = self.categories.filter(id__in=topics)
 
         notice = f"""
         \n
@@ -61,3 +65,19 @@ class Command(BaseCommand):
             \n\t {self._get_categories_menu(selected_categories)}
         """
         print(notice)
+
+        data_source_service = ArxivArticlesDataSourceService()
+
+        for selected_category in selected_categories:
+            data_source_response = data_source_service.get_articles(
+                category=selected_category,
+                fetch_interval_days=settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+            )
+            if data_source_response.respone.status_code == 200:
+                selected_category.sync_articles(data_source_response)
+            else:
+                # Todo - handle throttling and now 20x resonses
+                logger.error((
+                    f'Error fetching articles for category: {selected_category.name} '
+                    f'Response: {data_source_response.respone.text}'
+                ))

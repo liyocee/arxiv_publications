@@ -1,10 +1,8 @@
 
 import logging
-from datetime import timedelta
 
 import requests
 from articles.models import Category
-from config.settings import INITIAL_SYNC_FETCH_INTERVAL_DAYS
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone
@@ -22,7 +20,10 @@ class ArxivArticlesDataSourceService(ArticlesDataSourceService):
         url = settings.ARXIV_BASE_URL + "?verb=ListSets"
         return requests.get(url)
 
-    def get_articles(self, category: Category) -> ArticlesDataFetchResponse:
+    def get_articles(
+        self, category: Category,
+        fetch_interval_days: int
+    ) -> ArticlesDataFetchResponse:
         start_date = category.last_sync_date
         url = settings.ARXIV_BASE_URL
 
@@ -31,12 +32,13 @@ class ArxivArticlesDataSourceService(ArticlesDataSourceService):
                 timezone.now() - relativedelta(
                     months=settings.INITIAL_SYNC_OFFSET_MONTHS)
             )
-        end_date = start_date + timedelta(
-            days=INITIAL_SYNC_FETCH_INTERVAL_DAYS
+        end_date = start_date + relativedelta(
+            days=+fetch_interval_days
         )
 
-        date_format = '%Y-%M-%d'
-        paylod = {
+        date_format = '%Y-%m-%d'
+
+        payload = {
             'verb': 'ListRecords',
             'metadataPrefix': 'arXiv',
             'set': category.code,
@@ -45,9 +47,9 @@ class ArxivArticlesDataSourceService(ArticlesDataSourceService):
         }
 
         logging.info(
-            f'Fetching articles with fetch params: {paylod} from url {url}')
+            f'Fetching articles with fetch params: {payload} from url {url}')
 
-        response = requests.post(url, data=paylod)
+        response = requests.post(url, data=payload)
         return ArticlesDataFetchResponse(
             response=response,
             start_date=start_date.date(),

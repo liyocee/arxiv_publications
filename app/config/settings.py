@@ -139,5 +139,5 @@ LOGGING = {
 
 # How many many months ago should we sync the articles
 INITIAL_SYNC_OFFSET_MONTHS = 6
-INITIAL_SYNC_FETCH_INTERVAL_DAYS = 30
+INITIAL_SYNC_FETCH_INTERVAL_DAYS = 2
 ARXIV_BASE_URL = 'http://export.arxiv.org/oai2'

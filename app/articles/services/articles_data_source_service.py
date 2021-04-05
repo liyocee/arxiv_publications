@@ -10,6 +10,12 @@ class ArticlesDataFetchResponse:
         self.respone = response
         self.start_date = start_date
         self.end_date = end_date
+    
+    def __str__(self) -> str:
+        return (
+            f'StartDate: {self.start_date} '
+            f'EndDate: {self.start_date} '
+        )
 
 
 class ArticlesDataSourceService(ABC):
@@ -19,5 +25,9 @@ class ArticlesDataSourceService(ABC):
         raise NotImplementedError
 
     @abstractclassmethod
-    def get_articles(self, category: Category) -> ArticlesDataFetchResponse:
+    def get_articles(
+        self,
+        category: Category,
+        fetch_interval_days: int
+    ) -> ArticlesDataFetchResponse:
         raise NotImplementedError

@@ -1,6 +1,13 @@
-from django.db import models
+import logging
+from typing import List, Dict, Any
+
+from bs4 import BeautifulSoup
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from dateutil import parser
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractBaseModel(models.Model):
@@ -27,6 +34,62 @@ class Category(AbstractBaseModel):
     def __str__(self) -> str:
         return self.name
 
+    def sync_articles(self, articles_data_fetch_resonse):
+        from articles.models import Article
+        logging.info(
+            f'Syncing articles for category : {self.name} '
+            f'with params: {articles_data_fetch_resonse}'
+        )
+        parsed_response = BeautifulSoup(
+            articles_data_fetch_resonse.respone.text,
+            features='lxml'
+        )
+        records = parsed_response.findAll('record')
+
+        for record in records:
+            article_external_id = record.find('arXiv').find('id').text
+
+            try:
+                _ = Article.objects.get(external_id=article_external_id)
+            except Article.DoesNotExist:
+                category = None
+                try:
+                    category_code = record.find('header').find('setSpec').text
+                    category = Category.objects.get(code=category_code)
+                except Category.DoesNotExist:
+                    # Skip over categories we don't recognise
+                    continue
+
+                metadata = record.find('arXiv')
+                created_on = metadata.find('created').text
+                updated_on = metadata.find('updated').text
+                authors = metadata.find('authors').findAll('author')
+                title = metadata.find('title').text
+                sub_categories = metadata.find('categories').text
+                summary = metadata.find('abstract').text
+                article = Article.objects.create(
+                    created_on=parser.parse(created_on, dayfirst=False),
+                    updated_on=parser.parse(updated_on, dayfirst=False),
+                    title=title,
+                    external_id=article_external_id,
+                    summary=summary,
+                    category=category
+                )
+
+                ArticleAuthor.sync_article_authors(
+                    article=article,
+                    author_elements=authors
+                )
+
+                ArticleSubCategory.sync_article_sub_categories(
+                    article=article,
+                    sub_categories=sub_categories
+                )
+
+        # Update last sync date
+        self.last_sync_date = articles_data_fetch_resonse.end_date
+        self.save()
+
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('category')
         verbose_name_plural = _('categories')
@@ -40,7 +103,7 @@ class SubCategory(AbstractBaseModel):
         Category, null=False, blank=False, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=False, blank=False)
     code = models.CharField(
-        max_length=255, null=False, blank=False,
+        max_length=255, null=False, blank=False, unique=True,
         help_text="A unique code that identifies the sub category"
     )
 
@@ -51,6 +114,19 @@ class SubCategory(AbstractBaseModel):
         verbose_name = _('subcategory')
         verbose_name_plural = _('subcategories')
         unique_together = ('name', 'code')
+
+
+class Author(AbstractBaseModel):
+    last_name = models.CharField(max_length=255, null=False, blank=False)
+    first_name = models.CharField(max_length=255, null=False, blank=False)
+
+    def __str__(self) -> str:
+        return f'{self.last_name} {self.first_name}'
+
+    class Meta(AbstractBaseModel.Meta):
+        verbose_name = _('author')
+        verbose_name_plural = _('authors')
+        unique_together = ('last_name', 'first_name')
 
 
 class Article(AbstractBaseModel):
@@ -77,18 +153,6 @@ class Article(AbstractBaseModel):
         ]
 
 
-class Author(AbstractBaseModel):
-    name = models.CharField(
-        max_length=255, null=False, blank=False, unique=True)
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta(AbstractBaseModel.Meta):
-        verbose_name = _('author')
-        verbose_name_plural = _('authors')
-
-
 class ArticleAuthor(AbstractBaseModel):
     author = models.ForeignKey(
         Author, null=False, blank=False, on_delete=models.CASCADE)
@@ -97,6 +161,22 @@ class ArticleAuthor(AbstractBaseModel):
 
     def __str__(self) -> str:
         return f'Author: {self.author.name} | Article: {self.article.title}'
+
+    @classmethod
+    def sync_article_authors(cls, article: Article, author_elements: List[Any]) -> None:
+        for author_element in author_elements:
+            first_name = author_element.find('forenames')
+            last_name = author_element.find('keyname')
+
+            author = Author.objects.get_or_create(
+                first_name=first_name,
+                last_name=last_name
+            )
+
+            cls.objects.create(
+                author=author,
+                article=article
+            )
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('article_author')
@@ -115,6 +195,25 @@ class ArticleSubCategory(AbstractBaseModel):
             f'SubCategory: {self.sub_category.id} | '
             f'Article: {self.article.id}'
         )
+
+    @classmethod
+    def sync_article_sub_categories(
+        cls,
+        article: Article,
+        sub_categories: str
+    ) -> None:
+        sub_categories_codes = sub_categories.split(' ')
+
+        for sub_category_code in sub_categories_codes:
+            try:
+                sub_category = SubCategory.objects.get(code=sub_category_code)
+                cls.objects.create(
+                    article=article,
+                    sub_category=sub_category
+                )
+            except SubCategory.DoesNotExist:
+                # Ignore sub categories we cannot recognise
+                pass
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('article_subcategory')
