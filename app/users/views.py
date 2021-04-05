@@ -20,7 +20,7 @@ class UserRegistrationView(CreateView):
 
     def form_valid(self, form: UserRegistrationForm) -> HttpResponse:
         form.save()
-        return redirect('users:login')
+        return redirect(reverse('users:login'))
 
 
 class UserLoginView(LoginView):
