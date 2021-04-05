@@ -12,7 +12,7 @@ class ArticlesView(ListView):
     paginate_by = 25
 
     def get_queryset(self) -> QuerySet:
-        return Article.objects.all().order_by('-created_on')
+        return Article.objects.all().select_related('category').order_by('-created_on')
 
 
 class ArticlesDetailView(DetailView):

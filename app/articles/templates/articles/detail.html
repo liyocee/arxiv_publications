@@ -66,7 +66,7 @@
                 <tr>
                     <td scope='row'>{{ item.author.id }}</td>
                     <td> 
-                        <a href="{% url 'articles:author' item.author.id %}" > {{ item.author.first_name }}</a>
+                        <a href="{% url 'articles:author' item.author.id %}" > {{ item.author.name }}</a>
                     </td>
                     <td>{{ item.author.articleauthor_set.count }}</td>
                 </tr>

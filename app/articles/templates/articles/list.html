@@ -12,6 +12,7 @@
             <tr>
                 <th># Id</th>
                 <th>Title</th>
+                <th>Category</th>
                 <th>Created On</th>
             </tr>
         </thead>
@@ -20,6 +21,7 @@
                 <tr>
                     <td scope="row">{{ article.id }}</td>
                     <td> <a href="{% url 'articles:detail' article.id %}" >{{ article.title }}</a> </td>
+                    <td>{{ article.category.name }}</td>
                     <td>{{ article.created_on }}</td>
                 </tr>
             {% endfor %}
