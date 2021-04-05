@@ -7,6 +7,16 @@
 {% endblock pre_content %}
 
 {% block content %}
+
+    {% if request.user and request.user.is_authenticated %}
+        <span class="float-end">
+            <form method="post" action="{% url 'users:favourite_author' author_id=author.id %}">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="Favourite"/>
+            </form>
+            <br />&nbsp;
+        </span>
+    {% endif %}
     <table class="table table-striped table-hover">
         <thead>
             <tr>

@@ -20,3 +20,4 @@ class UserFavourite(AbstractBaseModel):
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('user_favourite')
         verbose_name_plural = _('user_favourites')
+        unique_together = ('user', 'content_type', 'object_id')

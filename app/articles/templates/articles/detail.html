@@ -5,9 +5,20 @@
     <h2 class="pb-2 border-bottom">
             {{ article.title }}
     </h2>
-{% endblock pre_content %}
 
+{% endblock pre_content %}
+jj
 {% block content %}
+
+    {% if request.user and request.user.is_authenticated %}
+        <span class="float-end">
+            <form method="post" action="{% url 'users:favourite_article' article_id=article.id %}">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="Favourite"/>
+            </form>
+            <br />&nbsp;
+        </span>
+    {% endif %}
     <table class="table table-bordered">
         <tbody>
                 <tr>
