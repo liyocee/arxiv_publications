@@ -1,1 +1,1 @@
-from .article_categories.seeder import ArticleCategorySeeder # noqa
+from .article_subcategories.seeder import ArticleSubCategorySeeder # noqa
