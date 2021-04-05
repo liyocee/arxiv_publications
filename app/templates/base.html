@@ -22,7 +22,11 @@
 
                 {% block pre_content %} {% endblock pre_content %}
 
-                {% block content %} {% endblock content %}
+                <div class="card">
+                    <div class="card-body">
+                        {% block content %} {% endblock content %}
+                    </div>
+                </div>
 
             {% endblock container %}
 
