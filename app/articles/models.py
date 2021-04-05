@@ -1,8 +1,9 @@
 import logging
-from typing import List, Dict, Any
+from typing import List, Any
 
 from bs4 import BeautifulSoup
-from django.db import models, transaction
+from django.db import models
+from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from dateutil import parser
@@ -47,22 +48,25 @@ class Category(AbstractBaseModel):
         records = parsed_response.findAll('record')
 
         for record in records:
-            article_external_id = record.find('arXiv').find('id').text
+            article_external_id = record.find('arxiv').find('id').text
+
+            article = None
 
             try:
-                _ = Article.objects.get(external_id=article_external_id)
-            except Article.DoesNotExist:
                 category = None
                 try:
-                    category_code = record.find('header').find('setSpec').text
+                    category_code = record.find('header').find('setspec').text
                     category = Category.objects.get(code=category_code)
                 except Category.DoesNotExist:
                     # Skip over categories we don't recognise
                     continue
 
-                metadata = record.find('arXiv')
+                metadata = record.find('arxiv')
                 created_on = metadata.find('created').text
-                updated_on = metadata.find('updated').text
+                updated_on_element = metadata.find('updated')
+                updated_on = (
+                    updated_on_element.text if updated_on_element else created_on
+                )
                 authors = metadata.find('authors').findAll('author')
                 title = metadata.find('title').text
                 sub_categories = metadata.find('categories').text
@@ -75,16 +79,19 @@ class Category(AbstractBaseModel):
                     summary=summary,
                     category=category
                 )
+                article.save()
+            except IntegrityError:
+                article = Article.objects.get(external_id=article_external_id)
 
-                ArticleAuthor.sync_article_authors(
-                    article=article,
-                    author_elements=authors
-                )
+            ArticleAuthor.sync_article_authors(
+                article=article,
+                author_elements=authors
+            )
 
-                ArticleSubCategory.sync_article_sub_categories(
-                    article=article,
-                    sub_categories=sub_categories
-                )
+            ArticleSubCategory.sync_article_sub_categories(
+                article=article,
+                sub_categories=sub_categories
+            )
 
         # Update last sync date
         self.last_sync_date = articles_data_fetch_resonse.end_date
@@ -165,18 +172,29 @@ class ArticleAuthor(AbstractBaseModel):
     @classmethod
     def sync_article_authors(cls, article: Article, author_elements: List[Any]) -> None:
         for author_element in author_elements:
-            first_name = author_element.find('forenames')
-            last_name = author_element.find('keyname')
+            first_name = author_element.find('forenames').text
+            last_name = author_element.find('keyname').text
 
-            author = Author.objects.get_or_create(
-                first_name=first_name,
-                last_name=last_name
-            )
+            author = None
 
-            cls.objects.create(
-                author=author,
-                article=article
-            )
+            try:
+                author = Author.objects.create(
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                author.save()
+            except IntegrityError:
+                author = Author.objects.get(
+                    first_name=first_name,
+                    last_name=last_name
+                )
+
+            if author:
+                try:
+                    author.articleauthor_set.create(article=article)
+                except IntegrityError:
+                    # the article author already exists
+                    pass
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('article_author')
@@ -213,6 +231,9 @@ class ArticleSubCategory(AbstractBaseModel):
                 )
             except SubCategory.DoesNotExist:
                 # Ignore sub categories we cannot recognise
+                pass
+            except IntegrityError:
+                # article subcategory already exists
                 pass
 
     class Meta(AbstractBaseModel.Meta):
