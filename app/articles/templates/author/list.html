@@ -1,0 +1,14 @@
+
+<h1>Author Articles</h1>
+<h2>Author: {{ author }}</h2>
+<table>
+    <tbody>
+        {% for item in author_articles %}
+            <tr>
+                <td>{{ item.article.id }}</td>
+                <td> {{ item.article.title }}</a> </td>
+                <td>{{ item.article.created_on }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
