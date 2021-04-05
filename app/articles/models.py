@@ -129,6 +129,10 @@ class Author(AbstractBaseModel):
 
     def __str__(self) -> str:
         return f'{self.last_name} {self.first_name}'
+    
+    @property
+    def name(self) -> str:
+        return f'{self.last_name} {self.first_name}'
 
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('author')

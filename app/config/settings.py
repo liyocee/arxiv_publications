@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import twitter_bootstrap
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # third party libs
+    'twitter_bootstrap',
+    'pipeline',
 
     # Custom Apps
     'articles.apps.ArticlesConfig',
@@ -122,6 +128,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
+)
+STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
 
 LOGGING = {
     'version': 1,
@@ -137,7 +150,18 @@ LOGGING = {
     },
 }
 
+
 # How many many months ago should we sync the articles
 INITIAL_SYNC_OFFSET_MONTHS = 6
 INITIAL_SYNC_FETCH_INTERVAL_DAYS = 2
 ARXIV_BASE_URL = 'http://export.arxiv.org/oai2'
+
+from .static_files import *  # noqa
+APP_STATICS_DIR = os.path.join(BASE_DIR, 'app', 'static', 'less')
+
+TWITTER_BOOSTSTRAP_STATIC_DIR = os.path.join(os.path.dirname(
+    twitter_bootstrap.__file__), 'static', 'less')
+
+PIPELINE_LESS_ARGUMENTS = u'--include-path={}'.format(
+    os.pathsep.join([TWITTER_BOOSTSTRAP_STATIC_DIR, APP_STATICS_DIR])
+)
