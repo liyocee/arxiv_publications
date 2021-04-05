@@ -15,9 +15,11 @@ Metadata synchronization is only happens for the articles that fall in the follo
 The project employs two sychronization approaches:
  - ## Initial synchronization
     - This happens when the application is setup for the first time
-    - It fetches six months worth of metadata
-    - It can be kick started by running the command: `python manage.py initial_articles_sync months_offset 3` :
-        - If `months_offset` option is not provided to the command, the sync process will default to syncing 6 months worth of data
+    - It fetches six months worth of metadata by default
+    - Initiating the initial data sync:
+        - To see topic/categories from which you sync the data, run the command: `python manage.py initial_articles_sync -h`
+        - To initiate the data sync, run the command: `python manage.py initial_articles_sync --months 1 --topics 1,2 `
+        - If `--months` option is not specified, we willd default to synci'ng for 6 months
 
 - ## Incremental synchronization
     - This happnes on daily basis via a background task
