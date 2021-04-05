@@ -1,60 +1,70 @@
-<h2>Articles details</h2>
-<table>
-    <tbody>
-            <tr>
-                <td>Id</td>
-                <td>{{ article.id }}</td>
-            </tr>
-            <tr>
-                <td>Title</td>
-                <td>{{ article.title }}</td>
-            </tr>
-            <tr>
-                <td>Created On</td>
-                <td>{{ article.created_on }}</td>
-            </tr>
-            <tr>
-                <td>Summary</td>
-                <td>{{ article.summary }}</td>
-            </tr>
 
-            <tr>
-                <td>Category</td>
+{% extends "base.html" %}
 
-                <td>{{ article.category.name }}</td>
-            </tr>
-            <tr>
-                <td>Sub Categories</td>
+{% block pre_content %}
+    <h2 class="pb-2 border-bottom">
+            {{ article.title }}
+    </h2>
+{% endblock pre_content %}
 
-                <td> 
-                    {% for item in article.articlesubcategory_set.all %}
-                        {{ item.sub_category.name }} | 
-                    {% endfor %}
-                </td>
-            </tr>
-            
-    </tbody>
-</table>
+{% block content %}
+    <table>
+        <tbody>
+                <tr>
+                    <td>Id</td>
+                    <td>{{ article.id }}</td>
+                </tr>
+                <tr>
+                    <td>Title</td>
+                    <td>{{ article.title }}</td>
+                </tr>
+                <tr>
+                    <td>Created On</td>
+                    <td>{{ article.created_on }}</td>
+                </tr>
+                <tr>
+                    <td>Summary</td>
+                    <td>{{ article.summary }}</td>
+                </tr>
 
-<h1>Authors</h1>
-<table>
+                <tr>
+                    <td>Category</td>
 
-    <thead>
-        <th>#Id</th>
-        <th>Name</th>
-        <th>Total Articles</th>
-    </thead>
+                    <td>{{ article.category.name }}</td>
+                </tr>
+                <tr>
+                    <td>Sub Categories</td>
 
-    <tbody>
-        {% for item in article.articleauthor_set.all %}
-            <tr>
-                <td>{{ item.author.id }}</td>
-                <td>{{ item.author.name }} </td>
-                <td> 
-                    <a href="{% url 'articles:author' item.author.id %}" > {{ item.author.first_name }}</a>
-                </td>
-                <td>{{ item.author.articleauthor_set.count }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    <td> 
+                        {% for item in article.articlesubcategory_set.all %}
+                            {{ item.sub_category.name }} | 
+                        {% endfor %}
+                    </td>
+                </tr>
+                
+        </tbody>
+    </table>
+
+    <h1>Authors</h1>
+    <table>
+
+        <thead>
+            <th>#Id</th>
+            <th>Name</th>
+            <th>Total Articles</th>
+        </thead>
+
+        <tbody>
+            {% for item in article.articleauthor_set.all %}
+                <tr>
+                    <td>{{ item.author.id }}</td>
+                    <td>{{ item.author.name }} </td>
+                    <td> 
+                        <a href="{% url 'articles:author' item.author.id %}" > {{ item.author.first_name }}</a>
+                    </td>
+                    <td>{{ item.author.articleauthor_set.count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

@@ -34,7 +34,7 @@ class AuthorArticlesView(ListView):
         author = self.get_author()
         return ArticleAuthor.objects.filter(
             author=author
-        ).select_related('article')[:20]
+        ).select_related('article').order_by('-article__created_on')[:20]
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)

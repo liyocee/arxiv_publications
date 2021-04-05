@@ -1,12 +1,21 @@
-<h1>Articles List</h1>
-<table>
-    <tbody>
-        {% for article in articles %}
-            <tr>
-                <td>{{ article.id }}</td>
-                <td> <a href="{% url 'articles:detail' article.id %}" >{{ article.title }}</a> </td>
-                <td>{{ article.created_on }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% extends "base.html" %}
+
+{% block pre_content %}
+    <h2 class="pb-2 border-bottom">
+        Published Articles
+    </h2>
+{% endblock pre_content %}
+
+{% block content %}
+    <table>
+        <tbody>
+            {% for article in articles %}
+                <tr>
+                    <td>{{ article.id }}</td>
+                    <td> <a href="{% url 'articles:detail' article.id %}" >{{ article.title }}</a> </td>
+                    <td>{{ article.created_on }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
