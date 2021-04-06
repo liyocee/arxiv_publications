@@ -47,5 +47,5 @@ The project employs two articles sychronization approaches:
 # Feature Enhancements:
 - Improve unit tests coverage - especially for the management commands
 - Add a page for logged in users to see all the articles / authors that they have favorited
-- Add error handling with retriex when we are throttled by Arxiv
+- Add error handling when fetching articles when we are throttled by Arxiv
 - Allow users to browse articles by categories/topics and sub-categories
