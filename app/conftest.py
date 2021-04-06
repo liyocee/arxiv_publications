@@ -69,13 +69,25 @@ def category(db: Any) -> Category:
 
 
 @pytest.fixture
-def article(db: Any, category: Category) -> Article:
-    article = Article.objects.create(
-        created_on=timezone.now().date(),
-        updated_on=timezone.now().date(),
-        external_id=random_lower_string(),
-        summary=random_lower_string(),
-        category=category
-    )
+def create_article(db: Any) -> Callable[[Category], Article]:
+    def make_article(category: Category):
 
-    return Article.objects.get(external_id=article.external_id)
+        article = Article.objects.create(
+            created_on=timezone.now().date(),
+            updated_on=timezone.now().date(),
+            external_id=random_lower_string(),
+            summary=random_lower_string(),
+            category=category
+        )
+
+        return Article.objects.get(external_id=article.external_id)
+    return make_article
+
+
+@pytest.fixture
+def article(
+    db: Any,
+    category: Category,
+    create_article: Callable[[Any, Category], Callable[[Category], Article]]
+) -> Article:
+    return create_article(category)
