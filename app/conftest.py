@@ -9,7 +9,7 @@ from test_utils.utils import (
 
 @pytest.fixture(scope="module")
 def test_password():
-    return random_lower_string()
+    return 'strong-password'
 
 
 @pytest.fixture(scope="module")
