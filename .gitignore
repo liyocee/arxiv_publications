@@ -3,3 +3,4 @@
 .vscode
 celerybeat-schedule.db
 db.sqlite3
+.coverage
