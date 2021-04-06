@@ -184,7 +184,7 @@ CELERY_QUEUES = {
 CELERY_BEAT_SCHEDULE = {
     'incremental-articles-sync-every-day': {
         'task': 'articles.tasks.task_incremental_articles_sync',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/5'),
         'args': (),
     },
 }

@@ -71,12 +71,12 @@ class Command(BaseCommand):
         for selected_category in selected_categories:
             data_source_response = data_source_service.get_articles(
                 category=selected_category,
-                fetch_interval_days=settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+                fetch_interval_days=selected_category.get_sync_interval_days()
             )
             if data_source_response.respone.status_code == 200:
                 selected_category.sync_articles(data_source_response)
             else:
-                # Todo - handle throttling and now 20x resonses
+                # Todo - handle throttling and now 20x responses
                 logger.error((
                     f'Error fetching articles for category: {selected_category.name} '
                     f'Response: {data_source_response.respone.text}'

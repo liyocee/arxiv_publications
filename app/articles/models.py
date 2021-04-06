@@ -7,6 +7,8 @@ from django.db import models
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,16 @@ class Category(AbstractBaseModel):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_sync_interval_days(self) -> int:
+        if not self.last_sync_date:
+            return settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+
+        delta = timezone.now() - self.last_sync_date
+
+        if delta.days > settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS:
+            return settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+        return delta.days
 
     def sync_articles(self, articles_data_fetch_resonse):
         from articles.models import Article
