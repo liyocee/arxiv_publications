@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import twitter_bootstrap
+from celery.schedules import crontab
 from pathlib import Path
 import os
 
@@ -154,3 +154,37 @@ ARXIV_BASE_URL = 'http://export.arxiv.org/oai2'
 # Auth
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost:6379')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
+REDIS_USER = 'default'
+
+CELERY_BROKER_URL = 'redis://:{}@{}'.format(REDIS_PASSWORD, REDIS_HOST)
+CELERY_BROKER_URL = 'redis://{}'.format(REDIS_HOST)
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_SEND_TASK_ERROR_EMAILS = True
+CELERY_REDIS_PASSWORD = REDIS_PASSWORD
+CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml', 'pickle']
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+CELERY_DEFAULT_QUEUE = 'publications'
+CELERY_ALWAYS_EAGER = True
+CELERY_QUEUES = {
+    'publications': {
+        "exchange": "default",
+        "routing_key": "default",
+    },
+}
+
+
+CELERY_BEAT_SCHEDULE = {
+    'incremental-articles-sync-every-day': {
+        'task': 'articles.tasks.task_incremental_articles_sync',
+        'schedule': crontab(minute='*/1440'),  # every 24 hours
+        'args': (),
+    },
+}

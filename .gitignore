@@ -1,4 +1,5 @@
 .venv
 *pyc
 .vscode
+celerybeat-schedule.db
 db.sqlite3

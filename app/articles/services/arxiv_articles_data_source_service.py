@@ -31,7 +31,8 @@ class ArxivArticlesDataSourceService(ArticlesDataSourceService):
             start_date = (
                 timezone.now() - relativedelta(
                     months=settings.INITIAL_SYNC_OFFSET_MONTHS)
-            )
+            ).date()
+
         end_date = start_date + relativedelta(
             days=+fetch_interval_days
         )
@@ -52,6 +53,6 @@ class ArxivArticlesDataSourceService(ArticlesDataSourceService):
         response = requests.post(url, data=payload)
         return ArticlesDataFetchResponse(
             response=response,
-            start_date=start_date.date(),
-            end_date=end_date.date()
+            start_date=start_date,
+            end_date=end_date
         )

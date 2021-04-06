@@ -3,6 +3,7 @@ from typing import Any, List
 
 from bs4 import BeautifulSoup
 from dateutil import parser
+from django.conf import settings
 from django.db import models
 from django.db.utils import IntegrityError
 from django.utils import timezone
@@ -34,6 +35,16 @@ class Category(AbstractBaseModel):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_sync_interval_days(self) -> int:
+        if not self.last_sync_date:
+            return settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+
+        delta = timezone.now().date() - self.last_sync_date
+
+        if delta.days > settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS:
+            return settings.INITIAL_SYNC_FETCH_INTERVAL_DAYS
+        return delta.days
 
     def sync_articles(self, articles_data_fetch_resonse):
         from articles.models import Article
@@ -176,8 +187,14 @@ class ArticleAuthor(AbstractBaseModel):
     @classmethod
     def sync_article_authors(cls, article: Article, author_elements: List[Any]) -> None:
         for author_element in author_elements:
-            first_name = author_element.find('forenames').text
-            last_name = author_element.find('keyname').text
+            last_name_element = author_element.find('keyname')
+            first_name_element = author_element.find('forenames')
+
+            if last_name_element is None:
+                continue
+
+            last_name = last_name_element.text
+            first_name = first_name_element.text if first_name_element else last_name
 
             author = None
 
