@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2021-04-06T15:48:01Z</responseDate>
+    <request verb="ListRecords" from="2021-03-30" metadataPrefix="arXiv" set="q-bio">http://export.arxiv.org/oai2</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>oai:arXiv.org:1303.1432</identifier>
+                <datestamp>2021-04-01</datestamp>
+                <setSpec>q-bio</setSpec>
+            </header>
+            <metadata>
+                <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+                    <id>1303.1432</id>
+                    <created>2013-03-06</created>
+                    <updated>2021-03-31</updated>
+                    <authors>
+                        <author>
+                            <keyname>Argasinski</keyname>
+                            <forenames>Krzysztof</forenames>
+                        </author>
+                        <author>
+                            <keyname>Broom</keyname>
+                            <forenames>Mark</forenames>
+                        </author>
+                    </authors>
+                    <title>Towards a replicator dynamics model of age structured populations</title>
+                    <categories>q-bio.PE math.CA nlin.AO</categories>
+                    <comments>52 pages, 8 figures</comments>
+                    <journal-ref>Journal of Mathematical Biology 2021</journal-ref>
+                    <doi>10.1007/s00285-021-01592-4</doi>
+                    <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+                    <abstract>Article Summmary</abstract>
+                </arXiv>
+            </metadata>
+        </record>
+     </ListRecords>
+</OAI-PMH>

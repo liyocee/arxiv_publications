@@ -10,7 +10,7 @@ class ArticlesDataFetchResponse:
         self.respone = response
         self.start_date = start_date
         self.end_date = end_date
-    
+
     def __str__(self) -> str:
         return (
             f'StartDate: {self.start_date} '
