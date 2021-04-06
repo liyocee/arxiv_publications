@@ -36,3 +36,7 @@ The project employs two sychronization approaches:
         - Start the workers:  `./celery_worker.sh`
     - Ensure to run the above commands on an activated virtual env we created above
     - You might want to add execute flag on the shell scripts before running them: `sudo chmod +x celery_beat.sh`
+
+
+# Running unit tests
+- Use the command: `pytest --cov`

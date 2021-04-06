@@ -1,43 +1,31 @@
 from django.contrib.auth.models import User
 from users.models import UserFavourite
-from articles.models import Author
-from django.test import TestCase
 from test_utils.utils import (
-    random_email, random_name, random_lower_string
+    random_email, random_name
 )
+import pytest
 
 
-class UserFavouriteTestCase(TestCase):
-    def setUp(self):
-        self.author: Author = Author.objects.create(
-            first_name=random_name(), last_name=random_name()
-        )
-        self.author = Author.objects.get(last_name=self.author.last_name)
-        self.user: User = User.objects.create(
-            first_name=random_name(),
-            last_name=random_name(),
-            email=random_email(),
-            username=random_lower_string()
-        )
+@pytest.mark.django_db
+def test_user_has_no_favourite(create_user, user_details, create_author):
+    author = create_author()
+    user_fav: UserFavourite = UserFavourite.objects.create(
+        user=create_user(**user_details),
+        content_object=author
+    )
 
-    def test_user_has_no_favourite(self):
-        user_fav: UserFavourite = UserFavourite.objects.create(
-            user=self.user,
-            content_object=self.author
-        )
+    user2: User = create_user(username=random_name(), email=random_email())
 
-        user2: User = User.objects.create(
-            first_name=random_name(),
-            last_name=random_name(),
-            email=random_email(),
-            username=random_lower_string()
-        )
+    assert user_fav.has_favourite(user2, author) is False
 
-        self.assertFalse(user_fav.has_favourite(user2, self.author))
 
-    def test_has_favourite(self):
-        user_fav: UserFavourite = UserFavourite.objects.create(
-            user=self.user,
-            content_object=self.author
-        )
-        self.assertTrue(user_fav.has_favourite(self.user, self.author))
+@pytest.mark.django_db
+def test_user_has_favourite(create_user, user_details, create_author):
+    author = create_author()
+    user = create_user(**user_details)
+    user_fav: UserFavourite = UserFavourite.objects.create(
+        user=user,
+        content_object=author
+    )
+
+    assert user_fav.has_favourite(user, author)
