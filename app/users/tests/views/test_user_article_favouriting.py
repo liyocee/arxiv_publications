@@ -1,5 +1,3 @@
-
-
 from users.models import UserFavourite
 from articles.models import Article
 import pytest
