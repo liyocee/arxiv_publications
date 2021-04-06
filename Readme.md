@@ -22,8 +22,8 @@ Metadata synchronization will only happens for the articles that fall in the fol
         - One for creating topic/articles classifications outlined here:  https://arxiv.org/help/api/user-manual 
 - Start the server: `python manage.py runserver`
 
-# Synchronization approahces
-The project employs two sychronization approaches:
+# Articles Synchronization approahces
+The project employs two articles sychronization approaches:
  - ## Initial synchronization
     - This happens when the application is setup for the first time
     - It fetches six months worth of metadata by default on specified topics/categories
