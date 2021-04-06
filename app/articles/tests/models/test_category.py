@@ -74,5 +74,7 @@ def test_sync_articles(category: Category):
         record = parsed_response.findAll('record')[0]
         article_external_id = record.find('arxiv').find('id').text
 
-        articles = Article.objects.filter(external_id=article_external_id) 
+        articles = Article.objects.filter(external_id=article_external_id)
         assert len(articles) == 1
+        category.refresh_from_db()
+        assert category.last_sync_date == end_date
