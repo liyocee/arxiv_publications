@@ -1,11 +1,12 @@
-from articles.models import Author
 import uuid
-from django.contrib.auth.models import User
+from typing import Any, Callable, Dict
+
 import pytest
-from typing import Callable, Dict, Any
-from test_utils.utils import (
-    random_email, random_name, random_lower_string
-)
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+from articles.models import Article, Author, Category
+from test_utils.utils import random_email, random_lower_string, random_name
 
 
 @pytest.fixture(scope="module")
@@ -50,3 +51,31 @@ def create_author(db: Any) -> Callable[[], Author]:
         )
         return Author.objects.get(last_name=author.last_name)
     return make_author
+
+
+@pytest.fixture
+def author(db: Any, create_author: Callable[[], Author]) -> Author:
+    return create_author()
+
+
+@pytest.fixture
+def category(db: Any) -> Category:
+    category = Category.objects.create(
+        name=random_name(),
+        code=random_lower_string(),
+        last_sync_date=timezone.now().date()
+    )
+    return Category.objects.get(code=category.code)
+
+
+@pytest.fixture
+def article(db: Any, category: Category) -> Article:
+    article = Article.objects.create(
+        created_on=timezone.now().date(),
+        updated_on=timezone.now().date(),
+        external_id=random_lower_string(),
+        summary=random_lower_string(),
+        category=category
+    )
+
+    return Article.objects.get(external_id=article.external_id)
