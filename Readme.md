@@ -45,7 +45,7 @@ The project employs two articles sychronization approaches:
 - Use the command: `pytest --cov`
 
 # Feature Enhancements:
-- Improve unit tests coverage. Righ now, only "users" app has been tested
+- Improve unit tests coverage - especially for the management commands
 - Add a page for logged in users to see all the articles / authors that they have favorited
 - Add error handling with retriex when we are throttled by Arxiv
 - Allow users to browse articles by categories/topics and sub-categories
