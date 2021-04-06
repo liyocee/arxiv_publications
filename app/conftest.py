@@ -2,18 +2,19 @@ from articles.models import Author
 import uuid
 from django.contrib.auth.models import User
 import pytest
+from typing import Callable, Dict, Any
 from test_utils.utils import (
     random_email, random_name, random_lower_string
 )
 
 
 @pytest.fixture(scope="module")
-def test_password():
+def test_password() -> str:
     return 'strong-password'
 
 
 @pytest.fixture(scope="module")
-def user_details():
+def user_details() -> Dict[str, str]:
     return {
         'first_name': random_name(),
         'last_name': random_name(),
@@ -23,7 +24,7 @@ def user_details():
 
 
 @pytest.fixture
-def create_user(db, test_password):
+def create_user(db: Any, test_password: str) -> Callable[[Dict[str, str]], User]:
     def make_user(**kwargs):
         kwargs['password'] = test_password
         if 'username' not in kwargs:
@@ -33,7 +34,16 @@ def create_user(db, test_password):
 
 
 @pytest.fixture
-def create_author(db):
+def user(
+    db: Any,
+    create_user: Callable[[Dict[str, str]], User],
+    user_details: Dict[str, str]
+) -> User:
+    return create_user(**user_details)
+
+
+@pytest.fixture
+def create_author(db: Any) -> Callable[[], Author]:
     def make_author():
         author = Author.objects.create(
             first_name=random_name(), last_name=random_name()
