@@ -16,7 +16,10 @@ Metadata synchronization is only happens for the articles that fall in the follo
     - `source .venv/bin/activate`
     - Install project dependencies:  `pip install -r requirements.txt`
 
-- Seed the database with initial data: `python manage.py seed` . The project uses the default sqlite database
+- Seed the database with initial data: `python manage.py seed` . The project uses the default sqlite database:
+    - We have two seeders:
+        - One for creating categories/topcis from Arxiv from this endpoint: http://export.arxiv.org/oai2?verb=ListSets
+        - One for creating topic/articles classifications outlined here:  https://arxiv.org/help/api/user-manual 
 - Start the server: `python manage.py runserver`
 
 # Synchronization approahces
