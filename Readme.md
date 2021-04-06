@@ -1,8 +1,8 @@
 # Scientific Publications
-This project synchronises metadata data about scientificic publications from the (Arxiv)[https://arxiv.org/] site.
+This project synchronises metadata data about scientificic publications from the [Arxix](https://arxiv.org/) site.
 
 ## Articles Categories
-Metadata synchronization is only happens for the articles that fall in the following categories:
+Metadata synchronization will only happens for the articles that fall in the following categories:
 - Psychiatry
 - Therapy
 - Data Science
@@ -26,7 +26,7 @@ Metadata synchronization is only happens for the articles that fall in the follo
 The project employs two sychronization approaches:
  - ## Initial synchronization
     - This happens when the application is setup for the first time
-    - It fetches six months worth of metadata by default on specified topic/categories
+    - It fetches six months worth of metadata by default on specified topics/categories
     - Initiating the initial data sync:
         - To see topic/categories from which you can sync the data, run the command: `python manage.py initial_articles_sync -h`
         - To initiate the data sync, run the command: `python manage.py initial_articles_sync --months 1 --topics 1,2 `
@@ -37,7 +37,7 @@ The project employs two sychronization approaches:
     - To start the background worker that does the daily sync, run the commands:
         - Start the scheduler:  `./celery_beat.sh`
         - Start the workers:  `./celery_worker.sh`
-    - Ensure to run the above commands on an activated virtual env we created above
+    - Ensure to run the above commands on an activated virtual env that we've created above
     - You might want to add execute flag on the shell scripts before running them: `sudo chmod +x celery_beat.sh`
 
 
